@@ -1,0 +1,10 @@
+---
+ansible_connection: winrm
+ansible_user: Administrateur@INFRAREADY.TEST
+ansible_port: 5985
+
+ansible_winrm_transport: kerberos
+ansible_winrm_scheme: http
+ansible_winrm_kinit_mode: manual
+ansible_winrm_message_encryption: always
+ansible_winrm_kerberos_delegation: false

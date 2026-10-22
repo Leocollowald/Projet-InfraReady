@@ -1,0 +1,11 @@
+---
+- name: Maintenance Linux InfraReady
+  hosts: linux
+  become: true
+
+  tasks:
+    - name: Mettre a jour les paquets Ubuntu
+      ansible.builtin.apt:
+        update_cache: true
+        upgrade: safe
+

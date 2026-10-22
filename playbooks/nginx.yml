@@ -1,0 +1,19 @@
+
+---
+- name: Installer et configurer Nginx sur SERVICE1
+  hosts: linux
+  become: true
+
+  tasks:
+    - name: Installer Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Demarrer et activer Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true

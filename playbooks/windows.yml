@@ -1,0 +1,35 @@
+
+---
+- name: Configurer et verifier le serveur Windows InfraReady
+  hosts: windows
+  gather_facts: false
+
+  tasks:
+    - name: Verifier la connexion Windows
+      ansible.windows.win_ping:
+
+    - name: Creer le repertoire d'automatisation InfraReady
+      ansible.windows.win_file:
+        path: 'C:\InfraReady\Automatisation'
+        state: directory
+
+    - name: Deployer un fichier de configuration de test
+      ansible.windows.win_copy:
+        dest: 'C:\InfraReady\Automatisation\infraready.txt'
+        content: |
+          Projet : InfraReady
+          Serveur : SRV-AD-WIN2025
+          Configuration geree par Ansible depuis OPS1
+
+    - name: Verifier le service DNS Windows
+      ansible.windows.win_service_info:
+        name: DNS
+      register: dns_info
+
+    - name: Valider que le service DNS fonctionne
+      ansible.builtin.assert:
+        that:
+          - dns_info.exists
+          - dns_info.services[0].state == 'started'
+        fail_msg: "Le service DNS Windows est absent ou arrete."
+        success_msg: "Le service DNS Windows est actif."

@@ -2,7 +2,7 @@
 
 InfraReady est un laboratoire d'administration de systèmes Linux et Windows réalisé avec VMware Workstation Pro. Le projet couvre la mise en place d'une infrastructure, l'automatisation de tâches d'administration, la supervision et le diagnostic d'un incident.
 
-- **Équipe :** Ilies BOSSUYT et Léo COLLOWLAD
+- **Équipe :** Ilies BOSSUYT et Léo COLLOWALD
 - **Formation :** Bachelor 3
 
 ## Architecture
@@ -11,7 +11,7 @@ Les trois machines virtuelles communiquent sur le réseau privé VMware NAT **VM
 
 | Machine | Système | Adresse IP | Rôle principal |
 | --- | --- | --- | --- |
-| SRV-AD-WIN2025 | Windows Server 2025 | `192.168.50.10` | Active Directory, DNS, partages et permissions NTFS, Windows Exporter |
+| SRV-AD-WIN2025 | Windows Server 2025 | `192.168.50.10` | Active Directory, DNS, comptes, groupes et permissions NTFS, Windows Exporter |
 | SRV-SERVICE1-UBUNTU26 | Ubuntu Server 26.04 | `192.168.50.20` | Nginx, comptes et stockage Linux, Node Exporter |
 | SRV-OPS1-UBUNTU26 | Ubuntu Server 26.04 | `192.168.50.30` | Ansible, Prometheus, Grafana et poste d'administration |
 
@@ -32,7 +32,7 @@ Depuis OPS1, Ansible administre SERVICE1 par SSH et le serveur Windows par WinRM
 - Domaine Active Directory avec six utilisateurs, trois groupes de sécurité et des permissions NTFS.
 - Administration Linux des comptes, groupes, permissions, services, journaux et d'un disque ext4 de 10 Go monté de façon persistante sur `/srv/infraready`.
 - Installation et activation de Nginx, ainsi que maintenance des paquets Ubuntu, avec Ansible.
-- Mises à jour Windows réalisées dans le laboratoire. Le playbook versionné contrôle la connectivité, crée un répertoire et un fichier de test, puis vérifie le service DNS ; il n'installe pas les mises à jour.
+- Mises à jour Windows réalisées dans le laboratoire. Le playbook versionné contrôle la connectivité, crée un répertoire et un fichier de test, puis vérifie le service DNS.
 - Supervision de la disponibilité, du CPU, de la RAM et du stockage ; alerte de perte de collecte et diagnostic d'un incident Node Exporter avec retour à la normale.
 - Validation automatique des fichiers Ansible et du YAML Prometheus avec GitHub Actions.
 
@@ -85,9 +85,11 @@ ansible-inventory -i inventory/hosts.ini --graph
 Exécuter les trois playbooks, selon l'opération souhaitée :
 
 ```bash
-ansible-playbook -i inventory/hosts.ini playbooks/nginx.yml
+ansible-playbook -i inventory/hosts.ini playbooks/nginx.yml --ask-become-pass
+ansible-playbook -i inventory/hosts.ini playbooks/maintenance.yml --ask-become-pass
+
+kinit Administrateur@INFRAREADY.TEST
 ansible-playbook -i inventory/hosts.ini playbooks/windows.yml
-ansible-playbook -i inventory/hosts.ini playbooks/maintenance.yml
 ```
 
 Ces playbooks ciblent les tâches décrites ci-dessus ; ils ne déploient pas les trois VM ni l'ensemble de leurs services.
@@ -109,11 +111,3 @@ Une exécution du workflow a déjà réussi. Les runners GitHub n'ont pas accès
 - L'administration Linux repose sur SSH ; l'administration Windows utilise WinRM avec Kerberos et chiffrement des messages.
 - Les VM sont des machines de laboratoire sur un réseau privé, avec des accès réseau restreints.
 - Le dépôt ne contient ni mot de passe ni clé privée ; l'inventaire référence seulement le chemin local d'une clé SSH.
-- Les serveurs Ubuntu ne sont pas intégrés au domaine Active Directory.
-- Le laboratoire utilise Ubuntu Server 26.04, alors que le sujet initial mentionnait Ubuntu 24.04 LTS.
-
-## Auteurs
-
-- Ilies BOSSUYT
-- Léo COLLOWLAD
-- Bachelor 3
